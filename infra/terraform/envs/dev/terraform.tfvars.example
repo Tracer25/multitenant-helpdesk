@@ -1,0 +1,4 @@
+aws_region        = "us-east-1"
+project_name      = "helpdesk"
+environment       = "dev"
+github_repository = "your-github-username/multitenant-helpdesk"

@@ -1,0 +1,57 @@
+name: CD
+
+# Requires these repository *variables* (Settings -> Secrets and variables ->
+# Actions -> Variables) populated from `terraform output` after Phase 3:
+#   AWS_REGION, AWS_ROLE_ARN, EKS_CLUSTER_NAME, ECR_REPOSITORY
+# No AWS access keys are stored anywhere -- auth is via GitHub OIDC assuming
+# the `github_actions` IAM role created in infra/terraform.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - uses: aws-actions/amazon-ecr-login@v2
+        id: ecr-login
+
+      - name: Build and push image
+        working-directory: api
+        env:
+          IMAGE: ${{ vars.ECR_REPOSITORY }}:${{ github.sha }}
+        run: |
+          docker build -t "$IMAGE" .
+          docker push "$IMAGE"
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name "${{ vars.EKS_CLUSTER_NAME }}" --region "${{ vars.AWS_REGION }}"
+
+      - uses: azure/setup-helm@v4
+        with:
+          version: v3.16.2
+
+      - name: Deploy
+        run: |
+          helm upgrade --install helpdesk-api ./helm/helpdesk-api \
+            --set image.repository="${{ vars.ECR_REPOSITORY }}" \
+            --set image.tag="${{ github.sha }}" \
+            --wait --timeout 5m
+
+      - name: Smoke test
+        run: |
+          kubectl run smoke-test --rm -i --restart=Never --image=curlimages/curl -- \
+            curl -sf http://helpdesk-api/healthz

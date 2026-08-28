@@ -1,0 +1,53 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: helpdesk
+      POSTGRES_PASSWORD: helpdesk
+      POSTGRES_DB: helpdesk
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U helpdesk"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # One-shot migration runner: builds from the same source as `api` but
+  # stops at the `build` stage (has devDependencies + migrations), applies
+  # the schema, then exits. `api` waits for this to succeed before starting.
+  migrate:
+    build:
+      context: ./api
+      target: build
+    working_dir: /app
+    command: ["npx", "node-pg-migrate", "up", "--migrations-dir", "migrations"]
+    environment:
+      DATABASE_URL: postgres://helpdesk:helpdesk@postgres:5432/helpdesk
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    build:
+      context: ./api
+      target: runtime
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      LOG_LEVEL: info
+      CORS_ORIGIN: "*"
+      DATABASE_URL: postgres://helpdesk:helpdesk@postgres:5432/helpdesk
+      JWT_SECRET: dev-only-change-me
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  pgdata:

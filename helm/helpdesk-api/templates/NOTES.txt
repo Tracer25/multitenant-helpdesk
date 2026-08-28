@@ -1,0 +1,20 @@
+helpdesk-api deployed as release "{{ .Release.Name }}" in namespace "{{ .Release.Namespace }}".
+
+{{- if .Values.ingress.enabled }}
+Ingress is enabled -- check its address with:
+  kubectl get ingress {{ include "helpdesk-api.fullname" . }} -n {{ .Release.Namespace }}
+{{- else }}
+Ingress is disabled. Port-forward to reach the API locally:
+  kubectl port-forward svc/{{ include "helpdesk-api.fullname" . }} -n {{ .Release.Namespace }} 3000:{{ .Values.service.port }}
+  curl http://localhost:3000/healthz
+{{- end }}
+
+{{- if not .Values.externalSecret.enabled }}
+
+externalSecret.enabled is false -- make sure a Secret named
+"{{ include "helpdesk-api.secretName" . }}" exists with keys DATABASE_URL and
+JWT_SECRET before pods will become ready, e.g.:
+  kubectl create secret generic {{ include "helpdesk-api.secretName" . }} \
+    --from-literal=DATABASE_URL=postgres://helpdesk:helpdesk@postgres:5432/helpdesk \
+    --from-literal=JWT_SECRET=dev-only-change-me
+{{- end }}

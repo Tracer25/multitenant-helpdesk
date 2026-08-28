@@ -1,0 +1,75 @@
+replicaCount: 2
+
+image:
+  # Set to the real ECR repo URL from Terraform output before deploying to EKS.
+  repository: helpdesk-api
+  tag: latest
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+    # eks.amazonaws.com/role-arn: arn:aws:iam::<account-id>:role/helpdesk-api-irsa
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 3000
+
+ingress:
+  enabled: false
+  className: alb
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/healthcheck-path: /healthz
+  host: ""
+  path: /
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70
+
+# Non-secret runtime config, mounted via ConfigMap.
+env:
+  NODE_ENV: production
+  PORT: "3000"
+  LOG_LEVEL: info
+  CORS_ORIGIN: "*"
+  JWT_EXPIRES_IN: 12h
+
+# DATABASE_URL and JWT_SECRET are never set here -- they're synced from AWS
+# Secrets Manager into a native Secret by External Secrets Operator. See
+# templates/externalsecret.yaml. Set externalSecret.enabled: false and
+# supply your own Secret named `<release>-helpdesk-api-secret` for local
+# `kind` testing without AWS.
+externalSecret:
+  enabled: true
+  secretStoreRef:
+    name: aws-secrets-manager
+    kind: ClusterSecretStore
+  remoteRef: helpdesk/dev/api
+  refreshInterval: 1h
+
+podSecurityContext:
+  runAsNonRoot: true
+  fsGroup: 1000
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop: ["ALL"]

@@ -1,0 +1,26 @@
+# Overrides for local `kind` validation (Phase 2) -- no AWS involved.
+# Usage:
+#   kubectl create secret generic helpdesk-api-secret \
+#     --from-literal=DATABASE_URL=postgres://helpdesk:helpdesk@postgres:5432/helpdesk \
+#     --from-literal=JWT_SECRET=dev-only-change-me
+#   helm install helpdesk-api ./helm/helpdesk-api -f helm/helpdesk-api/values-kind.yaml
+
+image:
+  repository: helpdesk-api
+  tag: local
+  pullPolicy: IfNotPresent
+
+ingress:
+  enabled: false
+
+# No AWS/External Secrets Operator on a local kind cluster -- fall back to a
+# manually created plain Secret named `<release>-helpdesk-api-secret`.
+externalSecret:
+  enabled: false
+
+serviceAccount:
+  annotations: {}
+
+autoscaling:
+  minReplicas: 1
+  maxReplicas: 2

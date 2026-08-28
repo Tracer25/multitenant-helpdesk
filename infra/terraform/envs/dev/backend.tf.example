@@ -1,0 +1,12 @@
+# Rename to backend.tf and fill in a pre-created S3 bucket + DynamoDB table
+# to move off local state. Left out by default so `terraform init` works
+# with zero pre-existing AWS resources.
+terraform {
+  backend "s3" {
+    bucket         = "CHANGE-ME-helpdesk-tfstate"
+    key            = "envs/dev/terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "CHANGE-ME-helpdesk-tflock"
+    encrypt        = true
+  }
+}
