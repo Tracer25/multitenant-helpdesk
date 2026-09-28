@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#173b36" />
+    <meta name="description" content="A clear, calm workspace for customer support." />
+    <title>Harbor | Helpdesk</title>
+    <link rel="stylesheet" href="/app.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <main id="auth-view" class="auth-shell" hidden>
+      <section class="auth-aside">
+        <div class="brand brand-light"><span class="brand-mark">h</span><span>harbor</span></div>
+        <div class="auth-story">
+          <p class="eyebrow">SUPPORT, IN GOOD SHAPE</p>
+          <h1>Make every<br />reply feel<br /><em>human.</em></h1>
+          <p class="story-note">A thoughtful home for the conversations that keep your customers moving.</p>
+        </div>
+        <span class="aside-foot">A calmer kind of helpdesk</span>
+      </section>
+      <section class="auth-main">
+        <div class="auth-mobile-brand brand"><span class="brand-mark">h</span><span>harbor</span></div>
+        <div class="auth-card">
+          <p class="eyebrow" id="auth-kicker">WELCOME BACK</p>
+          <h2 id="auth-title">Good to see you.</h2>
+          <p class="auth-copy" id="auth-copy">Sign in to pick up where your team left off.</p>
+          <div class="auth-tabs" role="tablist" aria-label="Account access">
+            <button class="auth-tab is-active" type="button" data-auth-mode="login" role="tab" aria-selected="true">Sign in</button>
+            <button class="auth-tab" type="button" data-auth-mode="signup" role="tab" aria-selected="false">Create workspace</button>
+          </div>
+          <form id="auth-form" class="form-stack">
+            <label class="field signup-only" hidden>Workspace name<input name="tenantName" autocomplete="organization" placeholder="Northstar Studio" /></label>
+            <label class="field">Workspace address<div class="slug-field"><span>harbor.app/</span><input name="tenantSlug" autocomplete="off" placeholder="northstar" required /></div></label>
+            <label class="field">Work email<input name="email" type="email" autocomplete="email" placeholder="you@company.com" required /></label>
+            <label class="field">Password<input name="password" type="password" autocomplete="current-password" minlength="8" placeholder="At least 8 characters" required /></label>
+            <p class="form-error" id="auth-error" role="alert" hidden></p>
+            <button class="button button-primary auth-submit" type="submit"><span id="auth-submit-label">Sign in</span><span aria-hidden="true">↗</span></button>
+          </form>
+          <p class="auth-legal">Your workspace is private, by design.</p>
+        </div>
+        <span class="auth-version">HARBOR SUPPORT DESK <span>·</span> BUILT FOR TEAMS</span>
+      </section>
+    </main>
+
+    <div id="app-view" class="app-shell" hidden>
+      <aside class="sidebar">
+        <a class="brand brand-light" href="#tickets" aria-label="Harbor home"><span class="brand-mark">h</span><span>harbor</span></a>
+        <div class="workspace-switcher"><span class="workspace-avatar" id="workspace-avatar">H</span><span class="workspace-label"><strong id="workspace-name">Your workspace</strong><small>Support team</small></span><span class="switcher-chevron">⌄</span></div>
+        <p class="nav-label">WORKSPACE</p>
+        <nav class="main-nav" aria-label="Main navigation">
+          <button class="nav-item is-current" type="button" data-view="tickets"><span class="nav-icon">▤</span>Inbox<span class="nav-count" id="nav-open-count">0</span></button>
+          <button class="nav-item" type="button" data-view="tickets" data-filter="resolved"><span class="nav-icon">✓</span>Resolved</button>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="help-note"><span class="help-spark">✳</span><p><strong>Here for your team</strong><br />Keep the conversation moving.</p></div>
+          <button class="profile-button" id="profile-button" type="button" title="Sign out"><span class="profile-avatar" id="profile-avatar">A</span><span class="profile-text"><strong id="profile-name">Account</strong><small id="profile-role">Admin</small></span><span class="profile-menu">···</span></button>
+        </div>
+      </aside>
+
+      <section class="main-area">
+        <header class="topbar"><div class="breadcrumb"><span>Workspace</span><span class="crumb-slash">/</span><strong>Inbox</strong></div><div class="topbar-actions"><span class="live-indicator"><i></i> All systems operational</span><button class="icon-button" id="refresh-button" type="button" aria-label="Refresh tickets" title="Refresh">↻</button><span class="topbar-avatar" id="topbar-avatar">A</span></div></header>
+        <main class="workspace-content">
+          <section class="page-heading"><div><p class="eyebrow">YOUR SUPPORT DESK</p><h1>Inbox<span class="heading-period">.</span></h1><p class="page-subtitle">A little order for the things that need your attention.</p></div><button class="button button-primary new-ticket-button" id="new-ticket-button" type="button"><span>＋</span> New ticket</button></section>
+          <section class="metrics" aria-label="Ticket overview"><div class="metric"><span class="metric-label">OPEN</span><strong id="metric-open">0</strong><span class="metric-note">Need a reply</span></div><div class="metric"><span class="metric-label">IN PROGRESS</span><strong id="metric-progress">0</strong><span class="metric-note">Being handled</span></div><div class="metric"><span class="metric-label">RESOLVED</span><strong id="metric-resolved">0</strong><span class="metric-note">Nicely done</span></div><div class="metric metric-total"><span class="metric-label">ALL CONVERSATIONS</span><strong id="metric-total">0</strong><span class="metric-note">Across your workspace</span></div></section>
+          <section class="inbox-layout" aria-label="Support inbox">
+            <div class="ticket-column">
+              <div class="list-toolbar"><div class="filter-tabs" role="tablist" aria-label="Filter tickets"><button type="button" class="filter-tab is-active" data-filter="all">All <span id="count-all">0</span></button><button type="button" class="filter-tab" data-filter="open">Open <span id="count-open">0</span></button><button type="button" class="filter-tab" data-filter="in_progress">In progress <span id="count-progress">0</span></button></div><label class="search-box"><span aria-hidden="true">⌕</span><input id="search-input" type="search" placeholder="Search inbox" aria-label="Search tickets" /></label></div>
+              <div class="ticket-list" id="ticket-list" aria-live="polite"></div>
+              <div class="list-foot" id="list-foot"></div>
+            </div>
+            <section class="detail-column" id="ticket-detail" aria-label="Ticket details"><div class="detail-empty"><div class="empty-illustration"><span>↗</span><i></i></div><p class="eyebrow">ONE THING AT A TIME</p><h2>Your inbox, in focus.</h2><p>Choose a conversation to see the details and keep things moving.</p></div></section>
+          </section>
+        </main>
+      </section>
+    </div>
+
+    <dialog class="ticket-dialog" id="ticket-dialog">
+      <form id="ticket-form" method="dialog" class="dialog-form">
+        <div class="dialog-heading"><div><p class="eyebrow">NEW CONVERSATION</p><h2>What needs a hand?</h2></div><button class="icon-button dialog-close" type="button" aria-label="Close">×</button></div>
+        <label class="field">Subject<input name="subject" maxlength="200" required placeholder="A short summary of the issue" /></label>
+        <label class="field">Details<textarea name="description" maxlength="10000" rows="5" placeholder="Share a little context..."></textarea></label>
+        <label class="field">Priority<select name="priority"><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option><option value="urgent">Urgent</option></select></label>
+        <p class="form-error" id="ticket-error" role="alert" hidden></p>
+        <div class="dialog-actions"><button class="button button-quiet dialog-cancel" type="button">Cancel</button><button class="button button-primary" type="submit">Create ticket <span aria-hidden="true">↗</span></button></div>
+      </form>
+    </dialog>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
