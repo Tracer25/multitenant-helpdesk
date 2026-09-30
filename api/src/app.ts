@@ -7,7 +7,6 @@ import authRoutes from './routes/auth.js';
 import ticketRoutes from './routes/tickets.js';
 import commentRoutes from './routes/comments.js';
 import userRoutes from './routes/users.js';
-import webRoutes from './routes/web.js';
 
 export async function buildApp(): Promise<FastifyInstance> {
   const app = Fastify({
@@ -20,7 +19,6 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(cors, { origin: config.corsOrigin });
   await app.register(authPlugin);
 
-  await app.register(webRoutes);
   await app.register(healthRoutes);
   await app.register(authRoutes);
   await app.register(ticketRoutes);
