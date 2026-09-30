@@ -47,7 +47,7 @@ export async function createTestApp(): Promise<{ app: FastifyInstance; pool: pg.
   process.env.JWT_SECRET = process.env.JWT_SECRET ?? 'test-secret';
   await ensureTestDatabase();
 
-  const { buildApp } = await import('../src/app.js');
+  const { buildApp } = await import('../src/application.js');
   const { pool } = await import('../src/db.js');
   const app = await buildApp();
   return { app, pool };

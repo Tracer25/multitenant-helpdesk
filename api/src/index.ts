@@ -1,4 +1,4 @@
-import { buildApp } from './app.js';
+import { buildApp } from './application.js';
 import { config } from './config.js';
 import { pool } from './db.js';
 
