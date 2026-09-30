@@ -1,9 +1,10 @@
+import Fastify from 'fastify';
 import { buildApp } from './application.js';
 import { config } from './config.js';
 import { pool } from './db.js';
 
 async function main() {
-  const app = await buildApp();
+  const app = await buildApp(Fastify);
 
   const shutdown = async (signal: string) => {
     app.log.info(`Received ${signal}, shutting down`);
